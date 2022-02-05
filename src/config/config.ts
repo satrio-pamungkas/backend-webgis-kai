@@ -1,4 +1,6 @@
-const secretWord: any | string = process.env.SECRET
+require('dotenv').config();
+
+const secretWord: any | string = process.env.SECRET;
 
 const AuthConfig = {
     secret: secretWord

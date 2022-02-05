@@ -47,3 +47,5 @@ const response500 = {
         }
     ]
 };
+
+export { response400, response401, response403, response404, response500 };

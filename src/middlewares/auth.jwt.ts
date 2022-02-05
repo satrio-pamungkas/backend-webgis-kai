@@ -2,34 +2,25 @@ import jwt, { verify, } from 'jsonwebtoken';
 import { AuthConfig } from '../config/config';
 import { UserModel } from '../models/user.model';
 import { RoleModel } from '../models/role.model';
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction, response } from 'express';
+import { response401, response403, response500 } from '../specs/response.specs';
 
 const verifyToken = (req: Request, res: Response, next: NextFunction) => {
     const bearer = req.headers['authorization'];
 
     if (!bearer) {
-        return res.status(403).json({
-            errors: [
-                {
-                    status: 403,
-                    title: 'Forbidden',
-                    message: 'Token tidak ada'
-                }
-            ]
-        });
+        const errorResponse = response403;
+        errorResponse.errors[0].message = 'Token tidak ada';
+
+        return res.status(403).json(errorResponse);
     }
 
     jwt.verify(bearer, AuthConfig.secret, (error: any, decoded: any) => {
         if (error) {
-            return res.status(401).json({
-                errors: [
-                    {
-                        status: 401,
-                        title: 'Unauthorized',
-                        message: 'Tidak diizinkan akses tanpa akun'
-                    }
-                ]
-            });
+            const errorResponse = response401;
+            errorResponse.errors[0].message = 'Tidak diizinkan akses tanpa akun';
+
+            return res.status(401).json(errorResponse);
         }
 
         req.body.userId = decoded.id;
@@ -42,28 +33,18 @@ const isPengusahaanAsset = (req: Request, res: Response, next: NextFunction) => 
 
     UserModel.findById(userId).exec((error: any, user: any) => {
         if (error) {
-            return res.status(500).json({
-                errors: [
-                    {
-                        status: 500,
-                        title: 'Internal Server Error',
-                        message: 'Default'
-                    }
-                ]
-            });
+            const errorResponse = response500;
+            errorResponse.errors[0].message = 'Error';
+
+            return res.status(500).json(errorResponse);
         }
 
         RoleModel.find({ _id: { $in: user.roles }}, (error: any, roles: any) => {
             if (error) {
-                return res.status(500).json({
-                    errors: [
-                        {
-                            status: 500,
-                            title: 'Internal Server Error',
-                            message: 'Default'
-                        }
-                    ]
-                });
+                const errorResponse = response500;
+                errorResponse.errors[0].message = 'Error';
+    
+                return res.status(500).json(errorResponse);
             }
 
             for (let i=0; i < roles.length; i++) {
@@ -73,15 +54,10 @@ const isPengusahaanAsset = (req: Request, res: Response, next: NextFunction) => 
                 }
             }
 
-            return res.status(403).json({
-                errors: [
-                    {
-                        status: 403,
-                        title: 'Forbidden',
-                        message: 'Default'
-                    }
-                ]
-            });
+            const errorResponse = response403;
+            errorResponse.errors[0].message = 'Akses dilarang';
+    
+            return res.status(403).json(errorResponse);
         });
     });
 };
@@ -91,28 +67,18 @@ const isPenjagaanAsset = (req: Request, res: Response, next: NextFunction) => {
 
     UserModel.findById(userId).exec((error: any, user: any) => {
         if (error) {
-            return res.status(500).json({
-                errors: [
-                    {
-                        status: 500,
-                        title: 'Internal Server Error',
-                        message: 'Default'
-                    }
-                ]
-            });
+            const errorResponse = response500;
+            errorResponse.errors[0].message = 'Error';
+
+            return res.status(500).json(errorResponse);
         }
 
         RoleModel.find({ _id: { $in: user.roles }}, (error: any, roles: any) => {
             if (error) {
-                return res.status(500).json({
-                    errors: [
-                        {
-                            status: 500,
-                            title: 'Internal Server Error',
-                            message: 'Default'
-                        }
-                    ]
-                });
+                const errorResponse = response500;
+                errorResponse.errors[0].message = 'Error';
+    
+                return res.status(500).json(errorResponse);
             }
 
             for (let i=0; i < roles.length; i++) {
@@ -122,15 +88,10 @@ const isPenjagaanAsset = (req: Request, res: Response, next: NextFunction) => {
                 }
             }
 
-            return res.status(403).json({
-                errors: [
-                    {
-                        status: 403,
-                        title: 'Forbidden',
-                        message: 'Default'
-                    }
-                ]
-            });
+            const errorResponse = response403;
+            errorResponse.errors[0].message = 'Akses dilarang';
+    
+            return res.status(403).json(errorResponse);
         });
     });
 };

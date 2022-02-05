@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import { UserModel } from '../models/user.model';
 import { RoleModel } from '../models/role.model';
 import { AuthConfig } from '../config/config';
+import { response401, response404, response500 } from '../specs/response.specs';
 
 const signUp = (req: Request, res: Response) => {
     const user = new UserModel({
@@ -14,42 +15,27 @@ const signUp = (req: Request, res: Response) => {
 
     user.save((error: any, user: any) => {
         if (error) {
-            return res.status(500).json({
-                errors: [
-                    {
-                        status: 500,
-                        title: 'Internal Server Error',
-                        message: 'Default'
-                    }
-                ]
-            });
+            const errorResponse = response500;
+            errorResponse.errors[0].message = 'Error';
+
+            return res.status(500).json(errorResponse);
         }
 
         RoleModel.find({ name: { $in: req.body.roles }}, (error: any, roles: any) => {
             if (error) {
-                return res.status(500).json({
-                    errors: [
-                        {
-                            status: 500,
-                            title: 'Internal Server Error',
-                            message: 'Default'
-                        }
-                    ]
-                });
+                const errorResponse = response500;
+                errorResponse.errors[0].message = 'Error';
+    
+                return res.status(500).json(errorResponse);
             }
 
             user.roles = roles.map((role: any) => role._id);
             user.save((error: any) => {
                 if (error) {
-                    return res.status(500).json({
-                        errors: [
-                            {
-                                status: 500,
-                                title: 'Internal Server Error',
-                                message: 'Default'
-                            }
-                        ]
-                    });
+                    const errorResponse = response500;
+                    errorResponse.errors[0].message = 'Error';
+        
+                    return res.status(500).json(errorResponse);
                 }
 
                 return res.status(201).json({
@@ -65,41 +51,26 @@ const signIn = (req: Request, res: Response) => {
         .populate("roles", "-__v")
         .exec((error: any, user: any) => {
             if (error) {
-                return res.status(500).json({
-                    errors: [
-                        {
-                            status: 500,
-                            title: 'Internal Server Error',
-                            message: 'Default'
-                        }
-                    ]
-                });
+                const errorResponse = response500;
+                errorResponse.errors[0].message = 'Error';
+    
+                return res.status(500).json(errorResponse);
             }
 
             if (!user) {
-                return res.status(404).json({
-                    errors: [
-                        {
-                            status: 404,
-                            title: 'Not Found',
-                            message: 'Default'
-                        }
-                    ]
-                });
+                const errorResponse = response404;
+                errorResponse.errors[0].message = 'Pengguna tidak terdaftar';
+    
+                return res.status(404).json(errorResponse);
             }
 
             const passwordValid = bcrypt.compareSync(req.body.password, user.password);
             
             if (!passwordValid) {
-                return res.status(401).json({
-                    errors: [
-                        {
-                            status: 401,
-                            title: 'Unauthorized',
-                            message: 'Default'
-                        }
-                    ]
-                });
+                const errorResponse = response401;
+                errorResponse.errors[0].message = 'Kata sandi tidak sesuai';
+    
+                return res.status(401).json(errorResponse);
             }
 
             const token = jwt.sign({ id: user.id }, AuthConfig.secret, {

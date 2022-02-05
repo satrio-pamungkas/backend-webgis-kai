@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { isValidObjectId } from "mongoose";
 import { AssetModel } from "../models/asset.model";
+import { response400, response404, response500 } from "../specs/response.specs";
 
 const getAllAssets = async (req: Request, res: Response) => {
     const assets = await AssetModel.find({});
@@ -14,30 +15,20 @@ const getAssetById = async (req: Request, res: Response) => {
     const { id } = req.params;
 
     if(!isValidObjectId(id)) { 
-        return res.status(400).json({
-            errors: [
-                {
-                    status: 400,
-                    title: 'Bad Request',
-                    message: 'Format parameter tidak sesuai spesifikasi'
-                }
-            ]
-        }); 
+        const errorResponse = response400;
+        errorResponse.errors[0].message = 'Format parameter tidak sesuai spesifikasi';
+
+        return res.status(400).json(errorResponse);
      }
 
     try {
         const asset = await AssetModel.findById({ '_id': id });
 
         if (!asset) {
-            return res.status(404).json({
-                errors: [
-                    {
-                        status: 404,
-                        title: 'Not Found',
-                        message: `Id with ${id} not found`
-                    }
-                ]
-            });
+            const errorResponse = response404;
+            errorResponse.errors[0].message = `Id dengan ${id} tidak ditemukan`;
+    
+            return res.status(404).json(errorResponse);
         }
 
         return res.status(200).json({
@@ -45,8 +36,10 @@ const getAssetById = async (req: Request, res: Response) => {
         });
 
     } catch (error) {
-        console.log(error);
-        res.status(500).send();
+        const errorResponse = response500;
+        errorResponse.errors[0].message = 'Error';
+
+        return res.status(500).json(errorResponse);
     }
     
 };
@@ -72,15 +65,10 @@ const createAsset = async (req: Request, res: Response) => {
     const created = AssetModel.create(asset);
 
     if (!created) {
-        return res.status(400).json({
-            errors: [
-                {
-                    status: 400,
-                    title: 'Bad Request',
-                    message: 'Format tidak sesuai spesifikasi'
-                }
-            ]
-        })
+        const errorResponse = response400;
+        errorResponse.errors[0].message = 'Format tidak sesuai spesifikasi';
+
+        return res.status(400).json(errorResponse);
     }
 
     return res.status(201).json({

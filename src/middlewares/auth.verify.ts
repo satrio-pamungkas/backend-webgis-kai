@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { UserModel } from "../models/user.model";
 import { ROLES } from '../config/config';
+import { response400, response404, response500 } from '../specs/response.specs';
 
 const checkDuplicateUsernameEmail = async (req: Request, res: Response, next: NextFunction) => {
     const username = req.body.username;
@@ -10,56 +11,36 @@ const checkDuplicateUsernameEmail = async (req: Request, res: Response, next: Ne
         const user = await UserModel.findOne({ username: username });
 
         if (user) {
-            return res.status(400).json({
-                errors: [
-                    {
-                        status: 400,
-                        title: 'Bad Request',
-                        message: 'Username sudah digunakan'
-                    }
-                ]
-            }); 
+            const errorResponse = response400;
+            errorResponse.errors[0].message = 'Username sudah digunakan';
+
+            return res.status(400).json(errorResponse);
         }
 
         try {
             const user = await UserModel.findOne({ email: email });
 
             if (user) {
-                return res.status(400).json({
-                    errors: [
-                        {
-                            status: 400,
-                            title: 'Bad Request',
-                            message: 'Username sudah digunakan'
-                        }
-                    ]
-                }); 
+                const errorResponse = response400;
+                errorResponse.errors[0].message = 'Email sudah digunakan';
+    
+                return res.status(400).json(errorResponse);
             }
 
             next();
 
         } catch {
-            return res.status(500).json({
-                errors: [
-                    {
-                        status: 500,
-                        title: 'Internal Server Error',
-                        message: 'Gagal'
-                    }
-                ]
-            });
+            const errorResponse = response500;
+            errorResponse.errors[0].message = 'Error';
+
+            return res.status(500).json(errorResponse);
         }
 
     } catch {
-        return res.status(500).json({
-            errors: [
-                {
-                    status: 500,
-                    title: 'Internal Server Error',
-                    message: 'Gagal'
-                }
-            ]
-        });
+        const errorResponse = response500;
+        errorResponse.errors[0].message = 'Error';
+
+        return res.status(500).json(errorResponse);
     }
 };
 
@@ -69,15 +50,10 @@ const checkRoles = (req: Request, res: Response, next: NextFunction) => {
     if (role) {
         for (let i=0; i < role.length; i++) {
             if (!ROLES.includes(role[i])) {
-                return res.status(400).json({
-                    errors: [
-                        {
-                            status: 400,
-                            title: 'Bad Request',
-                            message: 'Role tidak ditemukan'
-                        }
-                    ]
-                }); 
+                const errorResponse = response404;
+                errorResponse.errors[0].message = 'Role tidak ditemukan';
+    
+                return res.status(404).json(errorResponse);
             }
         }
     }
