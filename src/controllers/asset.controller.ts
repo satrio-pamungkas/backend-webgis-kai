@@ -19,7 +19,7 @@ const getAssetById = async (req: Request, res: Response) => {
                 {
                     status: 400,
                     title: 'Bad Request',
-                    message: 'Invalid paramater'
+                    message: 'Format parameter tidak sesuai spesifikasi'
                 }
             ]
         }); 

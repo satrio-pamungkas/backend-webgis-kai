@@ -1,4 +1,4 @@
-import mongoose, { Schema, model, Document, Types } from 'mongoose';
+import { Schema, model, Types } from 'mongoose';
 
 interface Geo {
     type: string;
