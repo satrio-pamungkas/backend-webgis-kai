@@ -5,7 +5,7 @@ import { isPenjagaanAsset, verifyToken } from "../middlewares/auth.jwt";
 export const AssetRoute = () => {
     const router = Router();
 
-    router.get('/assets', [verifyToken, isPenjagaanAsset], getAllAssets);
+    router.get('/assets', getAllAssets);
     router.get('/asset/:id', getAssetById);
     router.get('/assets/polygon', getPolygonAssets);
     router.get('/assets/point', getPointAssets);

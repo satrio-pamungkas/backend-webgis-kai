@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import { AssetRoute } from './src/routes/asset.route';
 import { databaseInit } from './src/utils/db.init';
+import { AuthRoute } from './src/routes/auth.route';
 
 const app = express();
 
@@ -20,6 +21,7 @@ mongoose.Promise = global.Promise;
 app.use(cors());
 app.use(express.static('public'));
 app.use(express.json());
+app.use('/', AuthRoute());
 app.use('/api', AssetRoute());
 
 app.listen(PORT, () => {

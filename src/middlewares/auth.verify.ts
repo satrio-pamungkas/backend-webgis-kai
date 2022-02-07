@@ -48,8 +48,14 @@ const checkRoles = (req: Request, res: Response, next: NextFunction) => {
     const role = req.body.roles;
 
     if (role) {
-        for (let i=0; i < role.length; i++) {
-            if (!ROLES.includes(role[i])) {
+        for (let i=0; i < ROLES.length; i++) {;
+            let count = 0;
+
+            if (!ROLES[i].includes(role)) {
+                count++;
+            }
+            
+            if (count > 1) {
                 const errorResponse = response404;
                 errorResponse.errors[0].message = 'Role tidak ditemukan';
     

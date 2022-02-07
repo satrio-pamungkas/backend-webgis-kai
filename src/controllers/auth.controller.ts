@@ -47,7 +47,7 @@ const signUp = (req: Request, res: Response) => {
 };
 
 const signIn = (req: Request, res: Response) => {
-    UserModel.findOne({ username: req.body.username })
+    UserModel.findOne({ email: req.body.email })
         .populate("roles", "-__v")
         .exec((error: any, user: any) => {
             if (error) {
